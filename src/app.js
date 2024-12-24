@@ -1,5 +1,5 @@
 const products = [
-  { id: 1, name: '商品1', price: 99.99 },
+  { id: 1, name: "商品", price: 99.99 },
   { id: 2, name: '商品2', price: 199.99 },
   { id: 3, name: '商品3', price: 299.99 }
 ];
@@ -7,7 +7,7 @@ const products = [
 class ShoppingApp {
   constructor() {
     this.cart = [];
-    this.init();
+    this.init()
   }
 
   init() {
@@ -42,4 +42,4 @@ class ShoppingApp {
   }
 }
 
-window.app = new ShoppingApp();
+window.app = new ShoppingApp()
