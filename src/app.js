@@ -7,7 +7,7 @@ const products = [
 class ShoppingApp {
   constructor() {
     this.cart = [];
-    this.init()
+    this.init();
   }
 
   init() {
@@ -42,4 +42,4 @@ class ShoppingApp {
   }
 }
 
-window.app = new ShoppingApp()
+window.app = new ShoppingApp();
