@@ -33,4 +33,34 @@ header {
   margin-top: 20px;
   padding: 20px;
   border-top: 1px solid #ddd;
+}
+
+.cart-items {
+  margin: 10px 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-total {
+  margin-top: 10px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.product-card button {
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.product-card button:hover {
+  background-color: #45a049;
 } 
