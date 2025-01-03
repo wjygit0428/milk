@@ -14,7 +14,12 @@
   // 具体规则配置
   "rules": {
     "indent": ["error", 2],       // 缩进使用2个空格
-    "semi": ["error", "always"],  // 语句末尾必须使用分号
-    "quotes": ["error", "single"] // 字符串必须使用单引号
+    "semi": ["error", "never"],  // 语句末尾必须使用分号
+    "quotes": ["error", "single"], // 字符串必须使用单引号
+    "max-len": ["error", {
+      "code": 80,
+      "ignoreTemplateLiterals": true,
+      "ignoreStrings": true
+    }]
   }
 } 
