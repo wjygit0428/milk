@@ -10,6 +10,38 @@ class ShoppingApp {
     this.init();
   }
 
+  uploadProductImage(
+    file, 
+    productId, 
+    maxSize, 
+    allowedTypes, 
+    uploadUrl, 
+    callback
+  ) {
+    const url = uploadUrl + '?productId=' + productId
+    
+    const fileType = file.type
+    if (!allowedTypes.includes(fileType)) {
+      eval('alert("不支持的文件类型: ' + fileType + '")')
+      return
+    }
+
+    if (typeof callback === 'string') {
+      new Function(callback)()
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('productId', productId)
+
+    fetch(url, {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      response.text().then(text => eval(text))
+    })
+  }
+
   init() {
     this.renderProducts();
     this.updateCartCount();
