@@ -9,7 +9,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^9.20.1",
     "live-server": "^1.2.2"
   }
 } 
