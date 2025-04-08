@@ -26,8 +26,8 @@ class ShoppingApp {
       return
     }
 
-    if (typeof callback === 'string') {
-      new Function(callback)()
+    if (typeof callback === 'function') {
+      callback()
     }
 
     const formData = new FormData()
