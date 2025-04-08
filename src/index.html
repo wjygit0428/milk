@@ -8,15 +8,32 @@
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>商品列表</h1>
-      <div id="cart-info">购物车: <span id="cart-count">0</span> 件</div>
-    </header>
-    
-    <main>
-      <div id="products" class="products-grid"></div>
-      <div id="cart" class="cart-panel"></div>
-    </main>
+    <!-- 登录面板 -->
+    <div id="loginPanel" class="login-panel">
+      <h2>用户登录</h2>
+      <form id="loginForm" class="login-form">
+        <input type="text" id="username" placeholder="用户名" required>
+        <input type="password" id="password" placeholder="密码" required>
+        <button type="submit">登录</button>
+      </form>
+    </div>
+
+    <!-- 主内容区 -->
+    <div id="mainContent" class="main-content" style="display: none;">
+      <header>
+        <h1>商品列表</h1>
+        <div class="user-info">
+          <span id="userDisplay"></span>
+          <button onclick="app.logout()">退出</button>
+        </div>
+        <div id="cart-info">购物车: <span id="cart-count">0</span> 件</div>
+      </header>
+      
+      <main>
+        <div id="products" class="products-grid"></div>
+        <div id="cart" class="cart-panel"></div>
+      </main>
+    </div>
   </div>
   <script type="module" src="app.js"></script>
 </body>

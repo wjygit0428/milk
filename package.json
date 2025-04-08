@@ -2,14 +2,16 @@
   "name": "shopping-demo",
   "version": "1.0.0",
   "description": "简单的购物界面演示",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "live-server",
-    "lint": "eslint src/**/*.js"
+    "start": "live-server src"
   },
-  "dependencies": {},
+  "dependencies": {
+    "alipay-sdk": "^3.6.1",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  },
   "devDependencies": {
-    "eslint": "^8.57.0",
     "live-server": "^1.2.2"
   }
 } 
