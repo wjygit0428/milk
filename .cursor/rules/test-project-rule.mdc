@@ -1,0 +1,1619 @@
+---
+description: gongfeng
+globs: 
+alwaysApply: true
+---
+## 【硬编码问题】不要使用魔法数字/魔法字符串
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 直接在代码中硬编码魔法值
+
+```JavaScript
+// Bad: 魔法数字多次出现
+function calculateDiscount(price: number) {
+  return price * 0.9; // 0.9 是一个魔法数字
+}
+
+function applyTax(amount: number) {
+  return amount + amount * 0.1; // 0.1 是另一个魔法数字
+}
+```
+
+
+
+### 正面案例
+
+#### 魔法值定义为常量枚举
+
+```JavaScript
+// Good: 使用枚举替代魔法字符串
+enum Status {
+  Active = 'active',
+  Inactive = 'inactive',
+  Pending = 'pending'
+}
+
+function getUserStatus(userId: number): Status {
+  // 假设这里有一些逻辑来确定用户的状态
+  return Status.Active;
+}
+```
+
+
+
+## 【代码逻辑问题】不应该在条件语句中直接判断 Promise 对象，需要用 await 获取异步调用后的返回值用于判断
+
+> 条件语句中的 promise 恒为真，不应该在条件语句中直接判断 Promise 对象，需要用 await 获取异步调用后的返回值用于判断。
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** B类要点
+
+**文档链接:** https://git.woa.com/standards/javascript#promimse--no-misused-promises
+
+### 反面案例
+
+#### 直接将 Promise 用于条件判断，因为 Promise 返回 Promise 处理对象，恒为真，导致此处判断会有问题
+
+```JavaScript
+const promise = (value) => new Promise((resolve, reject) => {
+  setTimeout(() => resolve(value), 1000);
+});
+
+async function foo() {
+  // bad - 恒为真
+  if (promise(1)) {
+    // Do something
+  }
+}
+```
+
+
+
+### 正面案例
+
+#### 使用`await`操作符拿到 Promise 的异步返回值用于条件判断，此处合理
+
+```JavaScript
+const promise = (value) => new Promise((resolve, reject) => {
+  setTimeout(() => resolve(value), 1000);
+});
+
+async function foo() {
+  // good - 使用 await 获取异步调用后的返回值
+  if (await promise(1)) {
+    // Do something
+  }
+}
+```
+
+
+
+## 【可读性问题】三元表达式不应该嵌套，通常是单行表达式
+
+> 三元表达式不应该嵌套，通常是单行表达式，如果确实需要多行表达式，那么应该考虑使用条件语句。
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+**文档链接:** https://git.woa.com/standards/javascript#comparison--nested-ternaries
+
+### 反面案例
+
+#### 嵌套使用三元表达式，让代码可读性大大降低
+
+```JavaScript
+const foo = maybe1 > maybe2
+  ? "bar"
+  : value1 > value2 ? "baz" : null;
+```
+
+
+
+### 正面案例
+
+#### 将嵌套的三元表达式拆分成两段，通过具有表述意义的变量存放第一处的判断，提高了整体代码可读性
+
+```JavaScript
+const maybeNull = value1 > value2 ? 'baz' : null;
+const foo = maybe1 > maybe2 ? 'bar' : maybeNull;
+```
+
+
+
+## 【代码格式】不要把 const 声明语句分散，也不要把 let 声明语句分散，而是要把它们分别放在一起
+
+> 不要把 const 声明语句分散，也不要把 let 声明语句分散，而是要把它们分别放在一起。如果需要根据前边的赋值变量指定一个变量时很有用，且更容易知道哪些变量是不希望被修改的。
+
+**语言:** JavaScript
+
+**问题级别:** Nice to have
+
+**要点类型:** A类要点
+
+**文档链接:** https://git.woa.com/standards/javascript#variables--const-let-group
+
+### 反面案例
+
+#### 将`const`声明语句和`let`声明语句交错写在一起，导致了代码更加复杂，可读性更低
+
+```JavaScript
+let i;
+const items = getItems();
+let dragonball;
+const goSportsTeam = true;
+let len;
+```
+
+
+
+### 正面案例
+
+#### 将`const`声明语句放在一起，同时把`let`声明语句放在一起
+
+```JavaScript
+const goSportsTeam = true;
+const items = getItems();
+let dragonball;
+let i;
+let length;
+```
+
+
+
+## 【代码设计问题】编写类尽量使用 class，避免直接操作 prototype
+
+> 编写类尽量使用 class，避免直接操作 prototype。class 语法更简洁，更容易看懂
+
+**语言:** JavaScript
+
+**问题级别:** Nice to have
+
+**要点类型:** A类要点
+
+**文档链接:** https://git.woa.com/standards/javascript#constructors--use-class
+
+### 反面案例
+
+#### 不建议直接访问函数的`prototype`对象来创建类
+
+```JavaScript
+function Queue(contents = []) {
+  this.queue = [...contents];
+}
+Queue.prototype.pop = function () {
+  const value = this.queue[0];
+  this.queue.splice(0, 1);
+  return value;
+};
+```
+
+
+
+### 正面案例
+
+#### 使用 class 语法创建类
+
+```JavaScript
+class Queue {
+  constructor(contents = []) {
+    this.queue = [...contents];
+  }
+  pop() {
+    const value = this.queue[0];
+    this.queue.splice(0, 1);
+    return value;
+  }
+}
+```
+
+
+
+## 【代码格式】在一般的编码规范中，常量的命名规范遵循蛇形命名法（Snake Case），变量命名全大写，通过下划线链接
+
+> 在一般的编码规范中，常量的命名规范遵循蛇形命名法（Snake Case），变量命名全大写，通过下划线链接
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+
+
+### 反面案例
+
+#### 常量未全大写，使用了驼峰命名法，违反了评审要点
+
+```JavaScript
+const constantA = 'yes';
+```
+
+
+
+### 正面案例
+
+#### 常量命名全大写，并使用下划线分隔单词，符合评审要点
+
+```JavaScript
+const CONSTANT_A = 'yes';
+```
+
+
+
+## 【可读性问题】变量/函数命名未具有可读性
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// 函数命名和变量命名不具有可读性
+function x(y, z) {
+    let a = y * z;
+    return a;
+}
+
+let q = 10;
+let r = 5;
+let s = x(q, r);
+console.log(s); // 输出50，但在实际场景中不容易理解输出的含义
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// 函数命名和变量命名具有可读性
+function calculateArea(width, height) {
+    let area = width * height;
+    return area;
+}
+
+let rectangleWidth = 10;
+let rectangleHeight = 5;
+let rectangleArea = calculateArea(rectangleWidth, rectangleHeight);
+console.log(rectangleArea); // 输出50，更容易理解是计算矩形的面积
+```
+
+
+
+## 【拼写错误】存在单词拼写错误
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【代码逻辑问题】存在没有处理的 if else 代码分支
+
+> 存在某个 if else 的分支，在其中没有逻辑处理的代码，属于无用的逻辑分支
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#24-%E5%AD%98%E5%9C%A8%E6%B2%A1%E6%9C%89%E5%A4%84%E7%90%86%E7%9A%84if-else%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF-%EF%BC%88-1%EF%BC%89
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// bad: 被注释的空的代码分支
+if (res && res.errCode === 0 && res.data) { // errCode: 
+  // this.setState({ 
+  // upCount: res.data.up ? parseInt(res.data.up) : (this.state.upCount + 1)
+  // })
+}
+
+// bad: 存在if else 没有退回的问题
+if(a){
+  return aaa
+}else if(b){
+  return bbb
+}else if(c){
+  // do somthing
+}
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// good: 对于每个条件分支/switch都有对应/兜底的处理：
+function keyFormatter(key, value) {
+  switch (key) {
+    case 'IssueDate':
+    case 'ExpiryDate':
+    case 'BirthDate': {
+      return {
+        [key]: '2022-01-01',
+      };
+    }
+    default: {
+      return {
+        [key]: value,
+      };
+    }
+  }
+}
+```
+
+
+
+## 【代码逻辑问题】注释和代码实际逻辑不符
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#35-%E7%BC%BA%E5%B0%91%E5%BF%85%E8%A6%81%E7%9A%84%E6%B3%A8%E9%87%8A%E3%80%81%E6%88%96%E8%80%85%E6%B3%A8%E9%87%8A%E5%92%8C%E9%80%BB%E8%BE%91%E4%B8%8D%E7%AC%A6-1
+
+### 反面案例
+
+#### 1. 注释是解释历史代码，之前在修改代码时只修改了实现，并没有同步到注释上
+2. 注释与代码逻辑不一致
+
+```JavaScript
+// Bad: 过时或不准确的注释
+function getUser(userId) {
+  // 从数据库获取用户信息（实际上现在是从缓存中获取）
+  return fetchUserFromCache(userId); // 假设fetchUserFromCache是新的实现
+}
+
+// Bad: 注释和代码逻辑不一致
+function calculateDiscount(price, discountRate) {
+  // 应用折扣率计算折后价格（实际上这里错误地将折扣率加到了原价上）
+  return price + price * discountRate; // 正确应该是 price - price * discountRate
+}
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// Good: 注释准确描述代码逻辑
+function calculateTotal(items) {
+  // 计算所有商品的总价
+  let total = 0;
+  for (const item of items) {
+    total += item.price * item.quantity; // 累加每个商品的价格乘以数量
+  }
+  return total;
+}
+```
+
+
+
+## 【代码设计问题】在声明了变量后，未使用该变量
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#13-%E6%9C%89%E7%94%B3%E6%98%8E%E4%BA%86%E5%8D%B4%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E5%8F%98%E9%87%8F%EF%BC%88-2%EF%BC%89
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// bad
+let v1 = 'var1';
+let v2 = 'var2';
+console.log(v1);
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// good
+let v1 = 'version1';
+console.log(v1);
+```
+
+
+
+## 【代码设计问题】未抽取可以复用的重复代码
+
+> 1. 对于某些相似的代码片段，在超过3行或以上相似的情况下才算作重复代码
+2. 如果有超过3行的相似代码，但是只是某个函数的重复调用，不属于重复代码，不需要抽取优化
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 
+
+```JavaScript
+function processDataForUsers(users) {
+  // 有相似的代码，但未进行提取重用
+  const result = [];
+  for (let i = 0; i < users.length; i++) {
+    let user = users[i];
+    if (user.isActive) {
+      user.processedDate = new Date();
+      result.push(user);
+    }
+  }
+  return result;
+}
+
+function processDataForAdmins(admins) {
+  // 重复了与 processDataForUsers 类似的代码
+  const result = [];
+  for (let i = 0; i < admins.length; i++) {
+    let admin = admins[i];
+    if (admin.isActive) {
+      admin.processedDate = new Date();
+      result.push(admin);
+    }
+  }
+  return result;
+}
+
+const users = [
+  { isActive: true, name: "User A" },
+  { isActive: false, name: "User B" },
+];
+
+const admins = [
+  { isActive: true, name: "Admin A" },
+  { isActive: true, name: "Admin B" },
+];
+
+console.log(processDataForUsers(users));
+console.log(processDataForAdmins(admins));
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// 正例：提取重复代码为可复用的函数
+function processUserData(data) {
+  // 重复代码提取得到一个可复用函数
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    let item = data[i];
+    if (item.isActive) {
+      item.processedDate = new Date();
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+function processDataForUsers(users) {
+  return processUserData(users);
+}
+
+function processDataForAdmins(admins) {
+  return processUserData(admins);
+}
+
+const users = [
+  { isActive: true, name: "User A" },
+  { isActive: false, name: "User B" },
+];
+
+const admins = [
+  { isActive: true, name: "Admin A" },
+  { isActive: true, name: "Admin B" },
+];
+
+console.log(processDataForUsers(users));
+console.log(processDataForAdmins(admins));
+```
+
+
+
+## 【代码设计问题】函数存在副作用，违背单向数据源原则，直接修改函数入参，污染传入的数据源。
+
+> 函数存在副作用，在函数内部直接修改传入参数的引用，导致作为参数传入的数据修改来源变多，后续维护代码时增加维护成本。
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** A类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#38-%E5%87%BD%E6%95%B0%E5%AD%98%E5%9C%A8%E5%89%AF%E4%BD%9C%E7%94%A8-%EF%BC%88-2%EF%BC%89
+
+### 反面案例
+
+#### 函数修改了入参数组，导致数据源被污染，违反了评审要点
+
+```JavaScript
+function addToArray(array, value) {
+    array.push(value); // 直接修改入参数组
+}
+```
+
+#### 函数修改了入参对象，未遵守单向数据流原则，违反了评审要点
+
+```JavaScript
+function updateObjectState(object) {
+    object.count += 1; // 直接修改入参对象
+}
+```
+
+
+
+### 正面案例
+
+#### 返回新数组，避免直接修改入参，符合评审要点
+
+```JavaScript
+function addToArray(array, value) {
+    return [...array, value]; // 返回新数组
+}
+```
+
+#### 返回新对象，避免直接修改入参，符合评审要点
+
+```JavaScript
+function updateObjectState(object) {
+    return { ...object, count: object.count + 1 }; // 返回新对象
+}
+```
+
+
+
+## 【可读性问题】超过3层回调嵌套
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#36-%E8%B6%85%E8%BF%873%E5%B1%82%E5%9B%9E%E8%B0%83%E5%B5%8C%E5%A5%97-%E6%88%96%E5%87%BA%E7%8E%B0%E5%9B%9E%E8%B0%83%E5%9C%B0%E7%8B%B1-3
+
+### 反面案例
+
+#### 过深地嵌套异步回调函数，导致代码难以读懂
+
+```JavaScript
+$.ajax({
+    url: 'api1',
+    success: function(res1) {
+        $.ajax({
+            url: 'api2',
+            success: function(res2) {
+                $.ajax({
+                    url: 'api3',
+                    success: function(res3) {
+                        $.ajax({
+                            url: 'api4',
+                            success: function(res4) {
+                                console.log(res4); // 五层嵌套
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+});
+```
+
+
+
+### 正面案例
+
+#### 使用 async/await 语法避免回调地狱
+
+```JavaScript
+async function fetchData() {
+    try {
+        const res1 = await callApi('api1');
+        const res2 = await callApi('api2');
+        const res3 = await callApi('api3');
+        const res4 = await callApi('api4');
+        console.log(res4);
+    } catch (error) {
+        console.error('请求失败:', error);
+    }
+}
+
+fetchData();
+```
+
+
+
+## 【可读性问题】存在大量注释掉的无用代码未删除
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Nice to have
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【可读性问题】函数嵌套层次过深
+
+> 1. 函数嵌套层次过深（超过4层），应该适当通过卫语句去减少函数嵌套层级
+2. 多个 if、for 循环平级并列的情况，并不算是嵌套行为
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// 嵌套层级过深，代码难以理解
+function processData(data) {
+  data.forEach(item => { // Level 1
+    if (item.active) { // Level 2
+      getDetails(item.id).then(details => { // Level 3
+        if (details.isAvailable) { // Level 4
+          performAction(details, result => { // Level 5
+            if (result.success) { // Level 6
+              console.log('Action performed successfully!');
+            } else {
+              console.log('Action failed.');
+            }
+          });
+        }
+      }).catch(error => {
+        console.error('Error fetching details:', error);
+      });
+    }
+  });
+}
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// 嵌套层次不深，代码逻辑较为清晰
+function processItem(items) {
+  if (!items) {
+    return null;
+  }
+  items.forEach(item => {
+    if (item.isActive) {
+      console.log(`Processing active item: ${item.name}`);
+    } else {
+      console.log(`Skipping inactive item: ${item.name}`);
+    }
+  });
+}
+```
+
+
+
+## 【可读性问题】存在大量冗余逻辑
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// bad: return 之后还有代码
+function bar() {
+  // do something;
+  return true;
+  // do other things;
+}
+
+// bad: 在正则表达式中使用没有必要的转义符
+const reg = /\&\#\@\,/;
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// good：对业务必要的才使用转义符
+const correctReg = /#&,\(\)/;
+```
+
+
+
+## 【硬编码问题】未抽出配置信息（数据库连接字符串、API 密钥、文件路径、APPKey 等），在代码中硬编码
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+
+
+### 反面案例
+
+#### 硬编码数据库连接密码，违反了评审要点
+
+```JavaScript
+async function connectToDatabase() {
+    const connection = await createConnection({
+        host: "localhost",
+        user: "root",
+        password: "password123", // 硬编码密码
+        database: "my_database",
+    });
+    return connection;
+}
+```
+
+#### 硬编码 API 密钥，违反了评审要点
+
+```JavaScript
+async function fetchDataFromAPI() {
+    const apiUrl = "https://api.example.com/data";
+    const apiKey = "my_secret_api_key"; // 硬编码 API 密钥
+    const response = await fetch(`${apiUrl}?key=${apiKey}`);
+    return response.json();
+}
+```
+
+
+
+### 正面案例
+
+#### 使用环境变量存储数据库连接信息，符合评审要点
+
+```JavaScript
+import { config } from "dotenv";
+config(); // 加载 .env 文件
+
+async function connectToDatabase() {
+    const connection = await createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD, // 从环境变量读取密码
+        database: process.env.DB_NAME,
+    });
+    return connection;
+}
+```
+
+#### 使用环境变量存储 API 密钥，符合评审要点
+
+```JavaScript
+async function fetchDataFromAPI() {
+    const apiUrl = process.env.API_URL;
+    const apiKey = process.env.API_KEY; // 从环境变量读取 API 密钥
+    const response = await fetch(`${apiUrl}?key=${apiKey}`);
+    return response.json();
+}
+```
+
+
+
+## 【硬编码问题】魔法数字/魔法字符串出现次数超过2次
+
+> 避免在代码中多次使用魔法数字或魔法字符串，应将其替换为有意义的常量。
+一个魔法数字在程序中出现多次，当数值改变时，可能要改不只一个地方，导致可维护性差。
+正确的使用命名量替代魔数可以改善可读性。
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#16-%E5%A4%A7%E9%87%8F%E4%BD%BF%E7%94%A8%E9%AD%94%E6%95%B0%EF%BC%88-2%EF%BC%89
+
+### 反面案例
+
+#### 
+
+```JavaScript
+// Bad: 魔法数字多次出现
+function calculateDiscount(price: number) {
+  return price * 0.9; // 0.9 是一个魔法数字
+}
+
+function applyTax(amount: number) {
+  return amount + amount * 0.1; // 0.1 作为魔法数字出现
+}
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// Good: 使用常量替代魔法值
+const DISCOUNT_NUM = 0.9;
+const TAX = 0.1;
+function calculateDiscount(price: number) {
+  return price * DISCOUNT_NUM;
+}
+
+function applyTax(amount: number) {
+  return amount + amount * TAX;
+}
+```
+
+
+
+## 【性能问题】Vue 组件模板中 v-for 未配合 key 使用
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#45-vue%E7%BB%84%E4%BB%B6%E6%A8%A1%E6%9D%BF%E4%B8%ADv-for%E6%B2%A1%E6%9C%89key%E9%85%8D%E5%A5%97%E4%BD%BF%E7%94%A8%EF%BC%88-2%EF%BC%89
+
+
+
+
+
+## 【性能问题】大量直接操作 dom 
+
+> 大量连续的插入、查询 dom 操作，消耗大量资源，容易导致页面性能变差
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#35-%E5%A4%A7%E9%87%8F%E7%9B%B4%E6%8E%A5%E6%93%8D%E4%BD%9Cdom%E8%8A%82%E7%82%B9-2
+
+
+
+
+
+## 【性能问题】使用了低效的算法，未优先使用标准库提供的功能
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【性能问题】高频触发的函数未进行节流/防抖优化
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【性能问题】在需要监听列表元素的事件时，未使用事件委托取代单个监听
+
+> 在需要频繁相似事件处理监听时，建议使用事件委托来取代单个元素的事件监听
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【错误处理】未删除多余的 async/await 
+
+> 有部分函数/方法没有使用异步操作，代码中依然存在无用的 async/await 操作符
+
+**语言:** JavaScript
+
+**问题级别:** Nice to have
+
+**要点类型:** B类要点
+
+
+
+
+
+
+
+## 【错误处理】ajax、promise 等未进行异常处理
+
+> 异步请求操作没有进行异常处理
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#23-ajax%E3%80%81promise-%E7%AD%89%E6%B2%A1%E6%9C%89%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86-%EF%BC%88-1%EF%BC%89
+
+### 反面案例
+
+#### 未处理 `AJAX` 请求的错误，违反了评审要点
+
+```JavaScript
+function fetchUserData() {
+    $.ajax({
+        url: "https://api.example.com/users",
+        success: (data) => {
+            console.log("User data:", data);
+        }
+        // 未处理错误情况
+    });
+}
+```
+
+#### 未处理 `Promise` 的错误，违反了评审要点
+
+```JavaScript
+function fetchData() {
+    fetch("https://api.example.com/users")
+        .then((response) => response.json())
+        .then((data) => console.log("Data:", data));
+        // 未处理错误情况
+}
+```
+
+
+
+### 正面案例
+
+#### 在 `AJAX` 请求中，明确指定 `error` 回调函数来处理错误情况，符合评审要点
+
+```JavaScript
+function fetchUserData() {
+    $.ajax({
+        url: "https://api.example.com/users",
+        success: (data) => {
+            console.log("User data:", data);
+        },
+        error: (error) => {
+            console.error("Error fetching user data:", error); // 处理错误情况
+        },
+    });
+}
+```
+
+#### 在 `Promise` 链中，使用 `.catch` 方法捕获并处理错误，符合评审要点
+
+```JavaScript
+function fetchData() {
+    fetch("https://api.example.com/users")
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => console.log("Data:", data))
+        .catch((error) => console.error("Error fetching data:", error)); // 处理错误情况
+}
+```
+
+#### 在使用 `async/await` 时，使用 `try-catch` 块捕获并处理错误，符合评审要点
+
+```JavaScript
+async function fetchUserDataAsync() {
+    try {
+        const response = await fetch("https://api.example.com/users");
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Data:", data);
+    } catch (error) {
+        console.error("Error fetching data:", error); // 处理错误情况
+    }
+}
+```
+
+
+
+## 【错误处理】捕获错误后未进行处理，如果需要忽略，建议注释说明原因
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 捕获错误但未进行任何处理，也没有添加注释说明原因，违反了评审要点
+
+```JavaScript
+function readUserPreferences() {
+    try {
+        const preferences = JSON.parse(localStorage.getItem("preferences")); // 调用 JSON.parse
+        console.log(preferences);
+    } catch (error) {} // 捕获错误但未进行任何处理，错误被忽略
+}
+```
+
+
+
+### 正面案例
+
+#### 捕获错误后打印日志记录并返回一个默认值，符合评审要点
+
+```JavaScript
+function readUserPreferences() {
+    try {
+        const preferences = JSON.parse(localStorage.getItem("preferences")); // 调用 JSON.parse
+        console.log(preferences);
+    } catch (error) {
+        console.error("Error reading user preferences:", error); // 记录错误
+        return {}; // 返回一个默认值
+    }
+}
+```
+
+#### 捕获异常后忽略错误但注释说明原因，符合评审要点
+
+```JavaScript
+async function fetchUserData() {
+    try {
+        const response = await fetch("https://api.example.com/users");
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        // 忽略错误，因为这是一个可选的操作，不影响主流程
+        // 此处注释说明原因，以便他人理解
+    }
+}
+```
+
+#### 捕获错误后打印日志记录并向上抛出异常，符合评审要点
+
+```JavaScript
+async function fetchUserData() {
+    try {
+        const response = await fetch("https://api.example.com/users");
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching data:", error); // 记录错误
+        throw error // 向上抛出异常
+    }
+}
+```
+
+
+
+## 【错误处理】使用如`JSON.parse`、调用外部 API、文件 I/O、访问数据库等函数时，未考虑异常处理
+
+> 使用如`JSON.parse`、调用外部 API、文件 I/O、访问数据库等可能返回错误的函数时，未考虑需要做的异常处理，可能会影响程序执行
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 使用 `JSON.parse` 但未捕获异常，可能导致程序崩溃，违反了评审要点
+
+```JavaScript
+function parseUserData(userData) {
+    const user = JSON.parse(userData); // 未捕获异常
+    console.log(user);
+}
+```
+
+#### 调用外部 API 时未处理错误，违反了评审要点
+
+```JavaScript
+async function fetchUserData() {
+    const response = await fetch("https://api.example.com/users"); // 未捕获 fetch 错误
+    const data = await response.json();
+    return data;
+}
+```
+
+#### 文件 I/O 未处理读写错误，违反了评审要点
+
+```JavaScript
+import fs from "fs";
+
+function readFileContents(filePath) {
+    const data = fs.readFileSync(filePath, "utf8"); // 未捕获异常
+    console.log(data);
+}
+```
+
+#### 数据库查询未处理错误，违反了评审要点
+
+```JavaScript
+async function getUsersFromDatabase() {
+    const connection = await createConnection(); // 假设这是一个数据库连接函数
+    const result = await connection.query("SELECT * FROM users"); // 未捕获异常
+    return result;
+}
+```
+
+
+
+### 正面案例
+
+#### 捕获了 `JSON.parse` 的异常，符合评审要点
+
+```JavaScript
+function parseUserData(userData) {
+    try {
+        const user = JSON.parse(userData);
+        console.log(user);
+    } catch (error) { // 捕获异常并打印日志
+        console.error("Error parsing JSON:", error);
+    }
+}
+```
+
+#### 调用外部 API 并处理错误，符合评审要点
+
+```JavaScript
+async function fetchUserData() {
+    try {
+        const response = await fetch("https://api.example.com/users");
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) { // 捕获异常并打印日志和重抛异常
+        console.error("Error fetching data:", error);
+        throw error;
+    }
+}
+```
+
+#### 文件 I/O 并处理错误，符合评审要点
+
+```JavaScript
+import fs from "fs";
+
+function syncReadFile(filePath) {
+    try {
+        const data = fs.readFileSync(filePath, "utf8");
+        console.log(data);
+    } catch (error) { // 捕获异常并打印日志
+        console.error(`Error reading file: ${error.message}`);
+    }
+}
+```
+
+#### 数据库查询并处理错误，符合评审要点
+
+```JavaScript
+async function getUsersFromDatabase() {
+    try {
+        const connection = await createConnection(); // 假设这是一个数据库连接函数
+        const result = await connection.query("SELECT * FROM users");
+        return result;
+    } catch (error) { // 捕获异常并打印日志和重抛异常
+        console.error("Database error:", error);
+        throw error;
+    }
+}
+```
+
+
+
+## 【边界条件】未处理除数为零的情况
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** A类要点
+
+
+
+
+
+
+
+## 【边界条件】访问可能为空的对象时，未处理空指针问题
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Critical issues
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 直接访问可能为 `null` 或 `undefined` 的对象的属性，违反了评审要点
+
+```JavaScript
+function getUserInfo(user) {
+    return user.address.street; // user 可能为 null，这会引发空指针异常
+}
+```
+
+#### 未检查 DOM 元素是否存在，违反了评审要点
+
+```JavaScript
+function getUserNameFromDOM() {
+    const nameElement = document.getElementById("username");
+    return nameElement.textContent.trim(); // 如果 #username 元素不存在，nameElement 为 null，这会引发空指针异常
+}
+```
+
+
+
+### 正面案例
+
+#### 使用可选链操作符避免空指针，符合评审要点
+
+```JavaScript
+function getUserInfo(user) {
+    return user?.address?.street ?? 'Address not available'; // 使用可选链操作符
+}
+```
+
+#### 使用三元运算符检查对象是否为空，符合评审要点
+
+```JavaScript
+function getUserNameFromDOM() {
+    const nameElement = document.getElementById("username");
+    return nameElement ? nameElement.textContent.trim() : "No name found"; // 检查元素是否存在
+}
+```
+
+#### 在访问可能为 `null` 或 `undefined` 的对象的属性之前进行判空，符合评审要点
+
+```JavaScript
+function getUserInfo(user) {
+    // 访问 user 的属性前进行判空，提前返回默认值
+    if (user === null) {
+        return 'Address not available'
+    }
+    return user.address.street;
+}
+```
+
+
+
+## 【代码格式】遗留大量多余的console.log调试日志
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Nice to have
+
+**要点类型:** B类要点
+
+
+
+
+
+
+
+## 【代码格式】括号风格不一致，单双引号混用，空格和制表符混用
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#12-%E6%8B%AC%E5%8F%B7%E9%A3%8E%E6%A0%BC%E4%B8%8D%E4%B8%80%E8%87%B4%EF%BC%8C%E5%8D%95%E5%8F%8C%E5%BC%95%E5%8F%B7%E6%B7%B7%E7%94%A8%EF%BC%8C%E7%A9%BA%E6%A0%BC%E5%92%8C%E5%88%B6%E8%A1%A8%E7%AC%A6%E6%B7%B7%E7%94%A8%EF%BC%88-2%EF%BC%89
+
+
+
+
+
+## 【代码格式】var、let、const 混用、乱用
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** B类要点
+
+**文档链接:** https://iwiki.woa.com/p/4006905110#11-var%E3%80%81let%E3%80%81const-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%BD%93%EF%BC%88%E6%B7%B7%E7%94%A8%E3%80%81%E4%B9%B1%E7%94%A8%EF%BC%89-2
+
+### 反面案例
+
+#### 重复定义同一个变量，会导致后面的覆盖掉前面的，容易造成逻辑错误，违反了评审要点
+
+```JavaScript
+// 重复定义同一个变量
+var var1 = 'var1 first.';
+var var1 = 'var1 second.';
+console.log(var1);
+```
+
+#### 变量先使用再定义，违反了评审要点
+
+```JavaScript
+// 变量先使用，后使用 var 定义
+v1 = 'version1';
+var v1;
+console.log(v1);
+```
+
+
+
+### 正面案例
+
+#### 使用 let 定义块级作用域的可变变量
+
+```JavaScript
+let userName: string;
+userName = "Jane Doe";
+console.log(userName);
+```
+
+#### 使用 const 定义不可变变量
+
+```JavaScript
+const PI = 3.14159;
+console.log(PI);
+```
+
+
+
+## 【代码格式】存在过多 eslint-disable 注释
+
+> 存在过多 eslint-disable 注释，导致 Typescript 检测失效，应该多借助 Typescript 的类型检测能力加强代码的健壮性
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 大量调试代码和注释代码观感不佳，另外代码中存在多个tslint-disable、eslint-disable的注释，而且这些注释本身可被修复。
+
+```JavaScript
+// eslint-disable-next-line no-console
+console.log('This is a log message.');
+
+// eslint-disable-next-line no-unused-vars
+const unusedVariable = 42;
+
+// eslint-disable-next-line eqeqeq
+if (true == 1) {
+  console.log('This is true.');
+}
+
+// eslint-disable-next-line
+function doSomething() {
+  // code
+}
+
+// 过多的 eslint-disable 注释让代码变得不易维护和很可能掩盖潜在的问题。
+```
+
+
+
+### 正面案例
+
+#### 
+
+```JavaScript
+// 仅在需要时禁用 ESLint 规则，并为每个禁用代码提供详细解释
+
+// 在这里我们需要输出到控制台用于调试
+console.log('This is a log message for debugging purposes.');
+
+// 通过移除未使用的变量，让代码保持干净
+function doSomething() {
+  const importantValue = 42;
+  console.log(importantValue);
+}
+
+// 使用严格相等来提高代码的可预测性
+if (true === 1) {
+  console.log('This is true.');
+}
+```
+
+
+
+## 【代码格式】参数名/类名/方法名 必须使用驼峰命名法，类名首字母必须大写，参数名/方法名首字母必须小写
+
+
+
+**语言:** JavaScript
+
+**问题级别:** Needs to improve
+
+**要点类型:** A类要点
+
+
+
+### 反面案例
+
+#### 类名 `user` 首字母小写，违反了评审要点
+
+```JavaScript
+// 类名首字母小写
+class user {
+    addComment(comment) {
+        return `Comment added: ${comment}`;
+    }
+}
+```
+
+#### 参数名 `FirstName` 首字母大写，违反了评审要点
+
+```JavaScript
+class UserDetails {
+    // 参数名首字母大写
+    updateName(FirstName) {
+        return `Name updated to: ${FirstName}`;
+    } 
+}
+```
+
+#### 方法名 `ProcessData` 首字母大写，违反了评审要点
+
+```JavaScript
+class DataProcessor {
+    // 方法名首字母大写
+    ProcessData(data) {
+        return true;
+    }
+}
+```
+
+
+
+### 正面案例
+
+#### 类名 `UserManager` 驼峰命名首字母大写，方法名 `addUser` 和 参数名 `userName` 驼峰命名首字母小写，符合评审要点
+
+```JavaScript
+// 类名驼峰命名首字母大写
+class UserManager {
+    // 方法名、参数名驼峰命名首字母小写
+    addUser(userName, userAge) {
+        return `Added user: ${userName}, age: ${userAge}`;
+    }
+}
+```
+
+
+
+
