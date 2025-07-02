@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.md
+alwaysApply: false
+---
+Always give a space between Chinese and English words while reformatting the code. 
