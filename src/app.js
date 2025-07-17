@@ -51,6 +51,11 @@ class ShoppingApp {
 
   renderActivityCountdown() {
     const header = document.querySelector('header');
+    if (!header) {
+      // Fail-safe: silently abort or log – adjust as needed
+      console.warn('Header element not found – countdown not rendered');
+      return;
+    }
     let countdownEl = document.getElementById('activity-countdown');
     if (!countdownEl) {
       countdownEl = document.createElement('div');
