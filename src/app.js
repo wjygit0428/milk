@@ -114,9 +114,7 @@ class ShoppingApp {
 
   // Add a product to the shopping cart and update the cart count.
   addToCart(productId) {
-    const product = products.find(p =
-
-> p.id === productId);
+    const product = products.find(p => p.id === productId);
     if (product) {
       this.cart.push(product); // Append the selected product to the cart.
       this.updateCartCount();  // Refresh the cart count display in the UI.
