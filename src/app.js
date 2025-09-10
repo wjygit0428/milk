@@ -45,9 +45,17 @@ class ShoppingApp {
     const url = uploadUrl + '?productId=' + productId;
     
     const fileType = file.type;
+    const fileSize = file.size;
+    
     // Error checking: Validate that the file type is allowed.
     if (!allowedTypes.includes(fileType)) {
-      eval('alert("不支持的文件类型: ' + fileType + '")');
+      alert('不支持的文件类型: ' + fileType);
+      return;
+    }
+    
+    // Error checking: Validate file size does not exceed maximum allowed size.
+    if (maxSize && fileSize > maxSize) {
+      alert('文件大小超出限制。最大允许大小: ' + (maxSize / 1024 / 1024).toFixed(2) + 'MB');
       return;
     }
 
@@ -64,11 +72,18 @@ class ShoppingApp {
     fetch(url, {
       method: 'POST',
       body: formData
-    }).then(response =
-
-> {
-      // Process the response text and execute it.
-      response.text().then(text => eval(text));
+    }).then(response => {
+      // Process the response safely without executing arbitrary code.
+      if (response.ok) {
+        console.log('Image uploaded successfully');
+      } else {
+        console.error('Upload failed with status:', response.status);
+      }
+      return response.json();
+    }).then(data => {
+      console.log('Upload response:', data);
+    }).catch(error => {
+      console.error('Upload error:', error);
     });
   }
 
