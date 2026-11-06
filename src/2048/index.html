@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>2048</h1>
+      <div class="scores">
+        <div class="score-box">分数<span id="score">0</span></div>
+        <div class="score-box">最高分<span id="best">0</span></div>
+      </div>
+    </header>
+    <button id="restart">新游戏</button>
+    <div class="board-wrap">
+      <div id="board" class="board"></div>
+      <div id="message" class="message hidden"></div>
+    </div>
+    <p class="tip">使用方向键 / WASD 或在屏幕上滑动来合并数字</p>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
